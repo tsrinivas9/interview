@@ -1,0 +1,122 @@
+# You are given a collection of person objects (in a natural manner
+
+# for the language you're writing in) with three fields:
+
+
+# {firstName, lastName, age}
+
+
+#     Example: {Jane, Smith, 14},
+
+#          or: {"firstName": "Jane", "lastName": "Smith", "age": 14}
+
+
+# We want to know which family has the longest line of "juniors". 
+
+# A family has "juniors" when multiple family members have the same full name.
+
+
+# Consider the following example.
+
+
+# [
+
+#     {"firstName": "John",  "lastName": "Doe",   "age": 13},
+
+#     {"firstName": "John",  "lastName": "Doe",   "age": 32},
+
+#     {"firstName": "John",  "lastName": "Doe",   "age": 62},
+
+#     {"firstName": "Janet", "lastName": "Doe",   "age": 14},
+
+#     {"firstName": "Jenny", "lastName": "Smith", "age": 34},
+
+#     {"firstName": "Jenny", "lastName": "Smith", "age": 12},
+
+# ]
+
+
+# In this example, the Doe family has the longest line of juniors.
+
+
+# Let’s talk about your plan of attack before you start coding, and remember 
+
+# to keep talking me through what you are doing as you code.
+
+#   Doe :  {John : 3}, {Janet : 1}, Smith : {Jenny : 1}
+
+
+def get_largest_family_member(input):
+
+  result_dict = {}
+
+  last_first = {}
+
+  for record in input:
+
+    last_name = record["lastName"]
+
+    first_name =record["firstName"]
+
+    
+
+    if last_name not in result_dict.keys():
+
+      last_first[last_name] = {first_name : 1}
+
+      if len(result_dict) == 0:
+
+        result_dict[last_name] = 1
+
+    else:
+
+      records = last_first[last_name]
+
+      for record in records:
+
+        if first_name in record.keys():
+
+          record[first_name] += 1
+
+          max_val = max(result_dict.values())
+
+          if max_val < record[first_name]:
+
+            result_dict.clear()
+
+            result_dict[last_name] = record[first_name]
+
+          elif max_val ==  record[first_name]:
+
+            result_dict[last_name] = record[first_name]
+
+  
+
+  return result_dict.keys()
+
+          
+
+  
+
+
+input = [
+
+    {"firstName": "John",  "lastName": "Doe",   "age": 13},
+
+    {"firstName": "John",  "lastName": "Doe",   "age": 32},
+
+    {"firstName": "John",  "lastName": "Doe",   "age": 62},
+
+    {"firstName": "Janet", "lastName": "Doe",   "age": 14},
+
+    {"firstName": "Jenny", "lastName": "Smith", "age": 34},
+
+    {"firstName": "Jenny", "lastName": "Smith", "age": 12},
+
+ ]
+
+
+get_largest_family_member(input)
+
+  
+
