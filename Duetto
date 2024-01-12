@@ -1,0 +1,333 @@
+import org.junit.*;
+
+import org.junit.runner.*;
+
+import java.util.*;
+
+
+/**
+
+Put -
+
+// Does not exist in cache
+
+cache.put(1, 10); // cache now contains item
+
+
+// Does exist in cache
+
+cache.put(1, 10); 
+
+cache.put(1, 11); // key is overwritten with new value
+
+
+// Call to get should mark a key as recently used
+
+cache = new LruCache(3);
+
+cache.put(1, 10); // least recently used
+
+cache.put(2, 20);
+
+cache.put(3, 30); // most recently used
+
+
+Get - 
+
+// Does not exist in cache
+
+cache.get(1); // returns null
+
+
+// Does exist in cache
+
+cache.put(1, 10);
+
+cache.get(1); // returns 10
+
+
+// Call to get should mark a key as recently used
+
+cache = new LruCache(3);
+
+cache.put(1, 10); // least recently used
+
+cache.put(2, 20);
+
+cache.put(3, 30); // most recently used
+
+cache.get(1); // should mark this key as most recently used
+
+*/
+
+public class Solution {
+
+class Node {
+
+int value;
+
+int key;
+
+Node next = null;
+
+Node previous = null;
+
+}
+
+class LruCache {
+
+private int capacity;
+
+private Node start = null;
+
+private Node last = null;
+
+private Map<Integer,Node> lurMap = new HashMap<>();
+
+
+public LruCache(int capacity) {
+
+// Implement me!
+
+this.capacity = capacity;
+
+}
+
+
+public Integer get(Integer key) {
+
+if (lurMap.containsKey(key)) {
+
+Node currNode = lurMap.get(key);
+
+Node previousNode = currNode.previous;
+
+Node nextNode = currNode.next;
+
+if (previousNode != null && previousNode.next == null) {
+
+previousNode.next = nextNode;
+
+last = previousNode;
+
+}
+
+if (nextNode != null) {
+
+nextNode.previous = previousNode;
+
+}
+
+start.previous = currNode;
+
+currNode.next = start;
+
+currNode.previous = null;
+
+start = currNode;
+
+return start.value;
+
+}
+
+return null;
+
+}
+
+
+public void put(Integer key, Integer value) {
+
+
+Node currNode = new Node();
+
+currNode.value = value;
+
+currNode.key = key;
+
+if (!lurMap.containsKey(key)) {
+
+if(this.capacity < lurMap.size()) {
+
+if (start != null) {
+
+start.previous = currNode;
+
+currNode.next = start;
+
+start = currNode;
+
+} else {
+
+start = currNode;
+
+last = currNode;
+
+}
+
+}
+
+} else {
+
+Node lastNode = last;
+
+lurMap.remove(lastNode.key);
+
+Node newLast = last.previous;
+
+newLast.next = null;
+
+start.previous = currNode;
+
+currNode.next = start;
+
+start = currNode;
+
+}
+
+
+lurMap.put(key,currNode);
+
+}
+
+}
+
+
+public static void main(String[] args) {
+
+JUnitCore.main("Solution");
+
+}
+
+
+@Test
+
+public void testGetNotInCache() {
+
+LruCache cache = new LruCache(3);
+
+Assert.assertNull(cache.get(23));
+
+}
+
+
+@Test
+
+public void testGetInCache() {
+
+LruCache cache = new LruCache(3);
+
+cache.put(23, 55);
+
+Assert.assertEquals(Integer.valueOf(55), cache.get(23));
+
+}
+
+
+@Test
+
+public void testGetChangesRecentlyUsed() {
+
+LruCache cache = new LruCache(3);
+
+
+// Fill up cache
+
+cache.put(1, 10);
+
+cache.put(2, 20);
+
+cache.put(3, 30);
+
+
+// Should update least recently used
+
+Assert.assertEquals(Integer.valueOf(10), cache.get(1));
+
+
+// Trigger eviction
+
+cache.put(4, 40);
+
+
+// Assert correct item is evicted
+
+Assert.assertNull(cache.get(2));
+
+Assert.assertEquals(Integer.valueOf(10), cache.get(1));
+
+Assert.assertEquals(Integer.valueOf(30), cache.get(3));
+
+Assert.assertEquals(Integer.valueOf(40), cache.get(4));
+
+}
+
+
+@Test
+
+public void testPutAlreadyInCache() {
+
+LruCache cache = new LruCache(3);
+
+
+cache.put(1, 10);
+
+Assert.assertEquals(Integer.valueOf(10), cache.get(1));
+
+cache.put(1, 11);
+
+Assert.assertEquals(Integer.valueOf(11), cache.get(1));
+
+}
+
+
+@Test
+
+public void testPutNewItem() {
+
+LruCache cache = new LruCache(3);
+
+
+Assert.assertNull(cache.get(1));
+
+cache.put(1, 10);
+
+Assert.assertEquals(Integer.valueOf(10), cache.get(1));
+
+}
+
+
+@Test
+
+public void testPutEvictRecentlyUsed() {
+
+LruCache cache = new LruCache(3);
+
+
+// Fill up cache
+
+cache.put(1, 10);
+
+cache.put(2, 20);
+
+cache.put(3, 30);
+
+
+// Trigger eviction
+
+cache.put(4, 40);
+
+
+// Assert correct item is evicted
+
+Assert.assertNull(cache.get(1));
+
+Assert.assertEquals(Integer.valueOf(20), cache.get(2));
+
+Assert.assertEquals(Integer.valueOf(30), cache.get(3));
+
+Assert.assertEquals(Integer.valueOf(40), cache.get(4));
+
+}
+
+}
+
